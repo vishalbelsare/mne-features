@@ -307,7 +307,7 @@ def _compute_quantile_feat_names(data, q, **kwargs):
     if n_quantiles == 1:
         return ['ch%s' % ch for ch in range(n_channels)]
     else:
-        return ['ch%s_%s' % (ch, i) for ch in range(n_channels)
+        return ['ch%s__%s' % (ch, i) for ch in range(n_channels)
                 for i in range(n_quantiles)]
 
 
@@ -447,6 +447,10 @@ def _app_samp_entropy_helper(data, emb, metric='chebyshev',
     output : ndarray, shape (n_channels, 2)
     """
     _all_metrics = KDTree.valid_metrics
+    try:  # new sklearn this is a method not a list
+        _all_metrics = KDTree.valid_metrics()
+    except TypeError:  # pragma: no-cover
+        pass
     if metric not in _all_metrics:
         raise ValueError('The given metric (%s) is not valid. The valid '
                          'metric names are: %s' % (metric, _all_metrics))
@@ -762,10 +766,10 @@ def _compute_pow_freq_bands_feat_names(data, freq_bands, normalize, ratios,
         n_freq_bands = (freq_bands.shape[0] - 1 if freq_bands.ndim == 1
                         else freq_bands.shape[0])
         _band_names = ['band' + str(j) for j in range(n_freq_bands)]
-    ratios_names = ['ch%s_%s/%s' % (ch, _band_names[i], _band_names[j])
+    ratios_names = ['ch%s__%s/%s' % (ch, _band_names[i], _band_names[j])
                     for ch in range(n_channels) for _, i, j in
                     _idxiter(n_freq_bands, triu=ratios_triu)]
-    pow_names = ['ch%s_%s' % (ch, _band_names[i]) for ch in
+    pow_names = ['ch%s__%s' % (ch, _band_names[i]) for ch in
                  range(n_channels) for i in range(n_freq_bands)]
     if ratios is None:
         return pow_names
@@ -1282,7 +1286,7 @@ def _compute_spect_slope_feat_names(data, **kwargs):
     :func:`mne_features.univariate.compute_energy_freq_bands`."""
     n_channels = data.shape[0]
     stats = ['intercept', 'slope', 'MSE', 'R2']
-    return ['ch%s_%s' % (ch, stat) for ch in range(n_channels)
+    return ['ch%s__%s' % (ch, stat) for ch in range(n_channels)
             for stat in stats]
 
 
@@ -1398,7 +1402,7 @@ def _compute_energy_fb_feat_names(data, freq_bands, deriv_filt):
         n_freq_bands = (freq_bands.shape[0] - 1 if freq_bands.ndim == 1
                         else freq_bands.shape[0])
         _band_names = ['band' + str(j) for j in range(n_freq_bands)]
-    return ['ch%s_%s' % (ch, _band_names[i]) for ch in range(n_channels)
+    return ['ch%s__%s' % (ch, _band_names[i]) for ch in range(n_channels)
             for i in range(n_freq_bands)]
 
 
@@ -1494,7 +1498,7 @@ def _compute_spect_edge_freq_feat_names(data, edge, **kwargs):
         else:
             _edge = edge
     n_edges = len(_edge)
-    return ['ch%s_%s' % (ch, i) for ch in range(n_channels)
+    return ['ch%s__%s' % (ch, i) for ch in range(n_channels)
             for i in range(n_edges)]
 
 
@@ -1546,7 +1550,7 @@ def _compute_wavelet_coef_energy_feat_names(data, wavelet_name, **kwargs):
     n_channels = data.shape[0]
     coefs = _wavelet_coefs(data, wavelet_name)
     levdec = len(coefs) - 1
-    return ['ch%s_%s' % (ch, i) for ch in range(n_channels)
+    return ['ch%s__%s' % (ch, i) for ch in range(n_channels)
             for i in range(levdec)]
 
 
@@ -1620,7 +1624,7 @@ def _compute_teager_kaiser_energy_feat_names(data, wavelet_name, **kwargs):
     n_channels = data.shape[0]
     coefs = _wavelet_coefs(data, wavelet_name)
     levdec = len(coefs) - 1
-    return ['ch%s_%s_%s' % (ch, i, stat) for ch in range(n_channels)
+    return ['ch%s__%s_%s' % (ch, i, stat) for ch in range(n_channels)
             for i in range(levdec + 1) for stat in ['mean', 'std']]
 
 
